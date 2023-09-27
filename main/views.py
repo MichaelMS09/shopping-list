@@ -15,7 +15,7 @@ from django.contrib.auth.decorators import login_required
 import datetime
 
 @login_required(login_url='/login')
-def show_main(request):
+def show_home(request):
     products = Product.objects.filter(user=request.user)
 
     context = {
@@ -25,7 +25,10 @@ def show_main(request):
         'last_login': request.COOKIES['last_login'],
     }
 
-    return render(request, "main.html", context)
+    return render(request, "home.html", context)
+
+def show_main(request):
+    return render(request, "main.html")
 
 def create_product(request):
     form = ProductForm(request.POST or None)
@@ -36,7 +39,11 @@ def create_product(request):
         product.save()
         return HttpResponseRedirect(reverse('main:show_main'))
     
-    context = {'form': form}
+    context = {
+        'form': form,
+        'name': request.user.username,
+    }
+    
     return render(request, "create_product.html", context)
 
 def register(request):
@@ -72,9 +79,28 @@ def logout_user(request):
     response.delete_cookie('last_login')
     return response
 
-def delete_product(request, product_id):
-    Product.objects.get(pk=product_id).delete()
+def delete_product(request, id):
+    # Get data berdasarkan ID
+    product = Product.objects.get(pk = id)
+    # Hapus data
+    product.delete()
+    # Kembali ke halaman awal
     return HttpResponseRedirect(reverse('main:show_main'))
+
+def edit_product(request, id):
+    # Get product berdasarkan ID
+    product = Product.objects.get(pk = id)
+
+    # Set product sebagai instance dari form
+    form = ProductForm(request.POST or None, instance=product)
+
+    if form.is_valid() and request.method == "POST":
+        # Simpan form dan kembali ke halaman awal
+        form.save()
+        return HttpResponseRedirect(reverse('main:show_main'))
+
+    context = {'form': form}
+    return render(request, "edit_product.html", context)
 
 def show_xml(request):
     data = Product.objects.all()
