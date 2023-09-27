@@ -9,12 +9,14 @@
     <h5>Class:</h5>
     <p>{{class}}</p>
 
-    <table>
+    <table border ="10">
         <tr>
             <th>Name</th>
+            <th>Amount</th>
             <th>Price</th>
             <th>Description</th>
             <th>Date Added</th>
+            <th>Options</th>
         </tr>
     
         {% comment %} Berikut cara memperlihatkan data produk di bawah baris ini {% endcomment %}
@@ -22,18 +24,32 @@
         {% for product in products %}
             <tr>
                 <td>{{product.name}}</td>
+                <td>{{product.amount}}</td>
                 <td>{{product.price}}</td>
                 <td>{{product.description}}</td>
                 <td>{{product.date_added}}</td>
+                <td>
+                    <a  href="{% url 'main:delete_product' product.id %}">
+                    <button id="button">Delete Product</button>
+                    </a>
+                </td>
             </tr>
         {% endfor %}
     </table>
     
     <br />
-    
+
     <a href="{% url 'main:create_product' %}">
         <button>
             Add New Product
         </button>
-    </a>    
+    </a>   
+
+    <h5>Sesi terakhir login: {{ last_login }}</h5>
+    
+    <a href="{% url 'main:logout' %}">
+        <button>
+            Logout
+        </button>
+    </a>
 {% endblock content %}
